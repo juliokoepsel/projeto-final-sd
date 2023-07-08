@@ -157,6 +157,8 @@ impl Estacionamento for EstacionamentoService {
 
 //Main
 use std::fs;
+type Result<T> = std::result::Result<T, error::Error>;
+type WebResult<T> = std::result::Result<T, Rejection>;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //Definição do endereço:
@@ -194,6 +196,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     Ok(())
+
+    /*
+    let db = DB::init().await?;
+
+    let carro = warp::path("carro");
+
+    let carro_routes = carro
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with_db(db.clone()))
+        .and_then(handler::create_carro_handler)
+        .or(carro
+            .and(warp::put())
+            .and(warp::path::param())
+            .and(warp::body::json())
+            .and(with_db(db.clone()))
+            .and_then(handler::edit_carro_handler))
+        .or(carro
+            .and(warp::delete())
+            .and(warp::path::param())
+            .and(with_db(db.clone()))
+            .and_then(handler::delete_carro_handler))
+        .or(carro
+            .and(warp::get())
+            .and(with_db(db.clone()))
+            .and_then(handler::carros_list_handler));
+
+    let routes = carro_routes.recover(error::handle_rejection);
+
+    println!("Started on port 8080");
+    warp::serve(routes).run(([0, 0, 0, 0], 8080)).await;
+    Ok(())
+    */
+}
+
+fn with_db(db: DB) -> impl Filter<Extract = (DB,), Error = Infallible> + Clone {
+    warp::any().map(move || db.clone())
 }
 
 //Model
